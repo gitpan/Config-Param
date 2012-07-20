@@ -79,7 +79,7 @@ paramorama - a tool to parse / write Config::Param config files for other progra
 
 =head1 SYNOPSIS
 
-	script/paramorama [parameters] some.conf [parameters] [param names]
+	paramorama [parameters] some.conf [parameters] [param names]
 
 =head1 DESCRIPTION
 

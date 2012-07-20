@@ -2,6 +2,10 @@
 
 =over 2
 
+=item * B<3.000003> (2012-07-20)
+
+Some documentation fixes of varying substance.
+
 =item * B<3.000002> (2012-07-20)
 
 And another release without functional changes, cleanup up the documentation and putting the plain text files also into POD format. Nicer lookin on da CPAN web, innit so?
@@ -50,7 +54,7 @@ Whoo! Already an update! Well, it's just a version bump because the first PAUSE 
 
 =back
 
-=item * B<2.x.y> (sometime in 2004, still)
+=item * B<2.x.y> (sometime in 2004, still, till 2012)
 
 =over 2
 
@@ -66,7 +70,7 @@ Whoo! Already an update! Well, it's just a version bump because the first PAUSE 
 
 =over 2
 
-=item - Putting a simple routine to handle command line and configuration file parsing into a module, only working on given 
+=item - Putting a simple routine to handle command line and configuration file parsing into a module, only working on given flat parameter specification.
 
 =back
 

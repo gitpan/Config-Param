@@ -19,7 +19,7 @@ use Carp;
 use 5.006;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000002';
+our $VERSION = '3.000003';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -1600,7 +1600,7 @@ That works for the B<<<EOT> multiline construct, too, just make it B<.<<EOT> for
 Also, just mentioning the parameter name sets it to a true value, like simple mentioning on command line.
 And that is actually one reason for not just using another markup or serialization format for configuration files: The specification in the file follows the same concepts you have on the command line (esp. regarding operator use). It is the same language, although with some slight deviation, like the here document and string quoting, which is matter of the shell in the case of command lines.
 
-Comments in the config file start with "#" and are supposed to be on lines on their own (otherwise, they might get parsed as part of a parameter value). Special tokens for the parser (see L<Config::Param::OtherFileWorker>) start with "=", the important one is inclusion of other config files:
+Comments in the config file start with "#" and are supposed to be on lines on their own (otherwise, they will get parsed as part of a parameter value). Special tokens for the parser (see see parse_file method, with the optional parameter) start with "=", the important one is inclusion of other config files:
 
 	=include anotherconfigfile
 
@@ -1647,7 +1647,7 @@ When not 0, be verbose about the work being done. There may be different verbosi
 
 =item B<multi> (0 / 1)
 
-Enable parsing of several configuration files one after another.
+If activated, potentially parses all located default config files in a row instead of choosing one (currently this is about generic and host config file; might get extended to system global vs. $HOME).
 
 =item B<confdir> (directory path)
 
@@ -1680,10 +1680,6 @@ Do not take final action on certain switches (help, version, config file printin
 =item B<noexit> (0 / 1)
 
 Do final actions, but do not exit on those. Also prevents dying in constructor (and by extension, the get routine). You are supposed to check the error list.
-
-=item B<returnall> (0 / 1)
-
-makes get() return not only the parameter hash but also other stuff that is needed by the wrapper module L<Config::Param::FileWorker>
 
 =item B<notinfile> (listref)
 

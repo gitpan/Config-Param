@@ -1,0 +1,28 @@
+Revision history for Config-Param
+
+3.000001 (2012-07-20)
+	- Whoo! Already an update! Well, it's just a version bump because the first PAUSE upload did not work.
+
+3.000000 (2012-07-20)
+	- Finally putting things on CPAN after prettifying the code and API cleanup (including the obligatory OO interface).
+	- Some features got added, of course:
+		- support for hashes
+		- noexit, output, linewidth, silenterr config entries
+	- Others got removed:
+		- automatic eval() of files
+		- ignorehelp config switch (just use nofinals)
+	- Behavioural changes:
+		- multliline values don't get a line end appended unless there is an empty line before the end marker. Before, it was not possible to enter values that don't end with a line end.
+		- --config is an array now, as well as optionally the file config entry
+	- Heck, stuff is tested meanwhile!
+
+2.x.y (sometime in 2004, still)
+	- Letting it grow and mature with the times, adding config hash to the API.
+	- Got a lot of use outside the music archive.
+	- Published on personal web page.
+
+1.x (sometime in 2004, slightly later)
+	- Putting a simple routine to handle command line and configuration file parsing into a module, only working on given 
+
+0.x (sometime in 2004)
+	- Starting to write a music archive management system and humbly writing scripts that take command line arguments.

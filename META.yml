@@ -1,6 +1,6 @@
 ---
 name: Config-Param
-version: 3.000001
+version: 3.000002
 author:
   - 'Thomas Orgis <thomas@orgis.org>'
 abstract: "all you want to do with parameters for your program (or someone else's)"
@@ -16,7 +16,7 @@ meta-spec:
 provides:
   Config::Param:
     file: lib/Config/Param.pm
-    version: 3.000001
+    version: 3.000002
   Config::Param::FileWorker:
     file: lib/Config/Param/FileWorker.pm
 resources:

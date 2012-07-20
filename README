@@ -1,3 +1,5 @@
+=head1 ABOUT
+
 This archive contains the distribution Config-Param
 
 It contains a comprehensive Module for program configuration from command line or configuration files, including handling of usual boilerplate behaviour like printing help message and exit.
@@ -16,7 +18,7 @@ There is one normal executable program, scripts/paramorama, that is installed al
 
 About the overly long module version, conceptually, this is standard dotted-decimal: major.minor.bugfix . It's just filled up to 3 digits for minor and bugfix, then the midle dot removed. It's safer with Perl that way.
 
-INSTALLATION
+=head1 INSTALLATION
 
 To install this module, run the following commands:
 
@@ -25,14 +27,14 @@ To install this module, run the following commands:
 	./Build test
 	./Build install
 
-SUPPORT AND DOCUMENTATION
+=head1 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Config::Param
 
-LICENSE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2004-2012 Thomas Orgis
 

@@ -1,28 +1,82 @@
-Revision history for Config-Param
+=head1 Revision history for Config-Param
 
-3.000001 (2012-07-20)
-	- Whoo! Already an update! Well, it's just a version bump because the first PAUSE upload did not work.
+=over 2
 
-3.000000 (2012-07-20)
-	- Finally putting things on CPAN after prettifying the code and API cleanup (including the obligatory OO interface).
-	- Some features got added, of course:
-		- support for hashes
-		- noexit, output, linewidth, silenterr config entries
-	- Others got removed:
-		- automatic eval() of files
-		- ignorehelp config switch (just use nofinals)
-	- Behavioural changes:
-		- multliline values don't get a line end appended unless there is an empty line before the end marker. Before, it was not possible to enter values that don't end with a line end.
-		- --config is an array now, as well as optionally the file config entry
-	- Heck, stuff is tested meanwhile!
+=item * B<3.000002> (2012-07-20)
 
-2.x.y (sometime in 2004, still)
-	- Letting it grow and mature with the times, adding config hash to the API.
-	- Got a lot of use outside the music archive.
-	- Published on personal web page.
+And another release without functional changes, cleanup up the documentation and putting the plain text files also into POD format. Nicer lookin on da CPAN web, innit so?
 
-1.x (sometime in 2004, slightly later)
-	- Putting a simple routine to handle command line and configuration file parsing into a module, only working on given 
+=item * B<3.000001> (2012-07-20)
 
-0.x (sometime in 2004)
-	- Starting to write a music archive management system and humbly writing scripts that take command line arguments.
+Whoo! Already an update! Well, it's just a version bump because the first PAUSE upload did not work.
+
+=item * B<3.000000> (2012-07-20)
+
+=over 2
+
+=item - Finally putting things on CPAN after prettifying the code and API cleanup (including the obligatory OO interface).
+
+=item - Some features got added, of course:
+
+=over 2
+
+=item - support for hashes
+
+=item - noexit, output, linewidth, silenterr config entries
+
+=back
+
+=item - Others got removed:
+
+=over 2
+
+=item - automatic eval() of files
+
+=item - ignorehelp config switch (just use nofinals)
+
+=back
+
+=item - Behavioural changes:
+
+=over 2
+
+=item - multliline values don't get a line end appended unless there is an empty line before the end marker. Before, it was not possible to enter values that don't end with a line end.
+
+=item - --config is an array now, as well as optionally the file config entry
+
+=back
+
+=item	- Heck, stuff is tested meanwhile!
+
+=back
+
+=item * B<2.x.y> (sometime in 2004, still)
+
+=over 2
+
+=item - Letting it grow and mature with the times, adding config hash to the API.
+
+=item - Got a lot of use outside the music archive.
+
+=item - Published on personal web page.
+
+=back
+
+=item * B<1.x> (sometime in 2004, slightly later)
+
+=over 2
+
+=item - Putting a simple routine to handle command line and configuration file parsing into a module, only working on given 
+
+=back
+
+=item * B<0.x> (sometime in 2004)
+
+=over 2
+
+=item - Starting to write a music archive management system and humbly writing scripts that take command line arguments.
+
+=back
+
+
+=back

@@ -1,22 +1,22 @@
-Any additions in functionality only after old functionality has tests in place!
+=head1 1. post-3.0.0: HALF-DONE: Add hashes, simple enough syntax 
 
-1. post-3.0.0: HALF-DONE: Add hashes, simple enough syntax --hash.=name=value, or just --hash=name=value
+	--hash.=name=value, or just --hash=name=value
 
 I think I prefer the former for consistency, --hash=name=value sets the whole hash to the single pair.
 Also, there will be hash-=name to delete an entry; perhaps hash+=name=value as alias to .= operator ... but then, would that prohibit other meaningful use of those?
 Hm, I don't define those for arrays ... but one could indeed define -= for removing elements (positive/negative number for pop/shift).
 
-3. post-3.0.0: consider supporting environment variables ... perhaps ... in the form PRORAM_PARNAME
+=head1 3. post-3.0.0: consider supporting environment variables ...
 
-This would add functionality that other packages have and make this a full superset. Also, the next point relates to this, regarding allowed names.
+perhaps ... in the form PROGRAM_PARNAME
 
-4. post-3.0.0: Consider proper parameter groups
+=head1 4. post-3.0.0: Consider proper parameter groups
 
 buntstift has tex.* parameters ... looks like a group, but is none. Do I need extra structure?
 
 Perhaps all that's needed is in config files, mimicking INI-style grouping via
 
-=prefix tex.
+	=prefix tex.
 
 (without or without dot ...)
 
@@ -24,6 +24,6 @@ That would prepend "tex." on all the following parameter names. Config::Param::p
 
 I could even add [tex.] as alias for that and, when avoiding here-document multiline strings and meta stuff, would have something that should parse as INI.
 
-8. post-3.0.0: $config{hidenonshort}
+=head1 8. post-3.0.0: $config{hidenonshort}
 
 consider providing a list of those instead ... or in addition, at least

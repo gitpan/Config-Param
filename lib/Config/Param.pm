@@ -19,7 +19,7 @@ use Carp;
 use 5.006;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000001';
+our $VERSION = '3.000002';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -1463,7 +1463,7 @@ Hash values are set via prefixing a key with following "=" before the actual val
 
 	--hashpar=name=value
 
-A nifty feature is the support of operators. Instead of B<--parm=value> you can do do B<--parm.=value>  to append something to the existing value. When B<-p> is the short form of B<--parm>, the same happens through B<-p.=value> or, saving one character, B<-p.value> .
+A nifty feature is the support of operators. Instead of B<--parm=value> you can do do B<--parm.=value>  to append something to the existing value. When B<-p> is the short form of B<--parm>, the same happens through B<-p.=value> or, saving one character, B<-p.value> (but I<not> B<--parm.value>, here the dot would be considered part of the parameter name).
 So "B<--parm=a --parm.=b -p.c>" results in the value of B<parm> being "abc".
 
 This is especially important for sanely working with hashes and arrays:
@@ -1501,7 +1501,7 @@ Numeric division of scalar value.
 
 =back
 
-You can omit the B<=> on the command line when using special operators, but not in the configuration file.
+You can omit the B<=> for the short-form (one-letter) of parameters on the command line when using special operators, but not in the configuration file.
 There it is needed for parser safety. The operators extend to the multiline value parsing in config files, though (see the section on config file syntax).
 
 See the B<lazy> configuration switch for a modified command line syntax, saving you some typing of "-" chars.
@@ -1510,28 +1510,33 @@ See the B<lazy> configuration switch for a modified command line syntax, saving 
 
 Based on the parameter definition Config::Param automatically prints the expected usage/help message when the (predefined!) B<--help> / B<-h> was given, with the info string in advance when defined, and exits the program. You can turn this behaviour off, of course. An example for the generated part of the help message:
 
-	some_program v1.2.3 - info text you gave
+	par_acceptor v1.0.0 - Param test program that accepts
+	any parameter given
 
-	Generic parameter example (list of real parameters follows):
-		paramorama -s -xyz -s=value --long --long=value [--] <files/stuff>
-	Just mentioning -s equals -s=1 (true), while +s equals -s=0
-	(false).
-	Using separator "--" makes sure that parameter parsing stops.
+	Generic parameter example (list of real parameters
+	follows):
+	        par_acceptor -s -xyz -s=value --long --long=value [--] [files/stuff]
+	Just mentioning -s equals -s=1 (true), while +s equals
+	-s=0 (false).
+	Using separator "--" makes sure that parameter parsing
+	stops.
 
 	Recognized parameters:
-	NAME, SHORT VALUE [# DESCRIPTION]
-	absolute, a 0 # print out absolute file paths
-	config, I   '' # Which configfile to use;
-	            special: just -I or --config causes printing a
-	            current config file to STDOUT
-	help, h ... 1 # show the help message; 1: normal help, >1:
-	            more help, -1: parameter list; "par": help for
-	            paramter "par" only
-	includes, i 0 # print out list of included config files
-	            referenced from the given one (including the
-	            primary one)
-	verbose ... 0 # be outspoken
-	version ... 0 # print out the program version
+	NAME, SHORT   VALUE [# DESCRIPTION]
+	ballaballa .. '0' # a parameter with meta data
+	bla ......... ['1']
+	blu ......... '42'
+	config, I ... [] # Which configfile(s) to use
+	              (overriding automatic search in likely
+	              paths);
+	              special: just -I or --config causes
+	              printing a current config file to STDOUT
+	help, h ..... 1 # show the help message; 1: normal
+	              help, >1: more help; "par": help for
+	              paramter "par" only
+	includepar .. 'I got included, yeah!'
+	version ..... 0 # print out the program version
+
 
 Note: When printing to a terminal, Config::Param tries to determine the screen width and does a bit of formatting to help readability of the parameter table.
 
@@ -1595,25 +1600,26 @@ That works for the B<<<EOT> multiline construct, too, just make it B<.<<EOT> for
 Also, just mentioning the parameter name sets it to a true value, like simple mentioning on command line.
 And that is actually one reason for not just using another markup or serialization format for configuration files: The specification in the file follows the same concepts you have on the command line (esp. regarding operator use). It is the same language, although with some slight deviation, like the here document and string quoting, which is matter of the shell in the case of command lines.
 
-Comments in the config file start with "#" and are supposed to be on lines on their own (otherwise, they might get parsed as part of a parameter value). Special tokens for the parser (see Config::Param::OtherFileWorker) start with "=", the important one is inclusion of other config files:
+Comments in the config file start with "#" and are supposed to be on lines on their own (otherwise, they might get parsed as part of a parameter value). Special tokens for the parser (see L<Config::Param::OtherFileWorker>) start with "=", the important one is inclusion of other config files:
 
 	=include anotherconfigfile
 
 This will locate anotherconfigfile (relative paths are relative to the current config file, also search paths are used) and load its settings in-place, then continue with the current file. Note that there is no check for inclusion loops (yet). The file name starts with the first non-whitespace after B<=include> and continues until the end of line. No quoting.
 
-There are more tokens in a fully annotated output of config files, holding the meta data about the parameter space to enable other programs to read and understand the configuration file (see Config::OtherFileWorker, which is used to code generic frontends to programs using Config::Param. Example:
+There are more tokens in a fully annotated output of config files. Example:
 
-	# this is a comment
-	=param file for buntstift
-	=version 0.25 (01.06.2007)
+	# I skipped  block of comments explaining the config file syntax.
+	=param file for par_acceptor
+	=version 1.0.0
 
-	=info wrapper around gnuplot for some quick shot plotting
+	=info Param test program that accepts any parameter given
 
-	=long all-binary
-	=help specify binary stuff... one format for all files!
-	all-binary = ""
+	=long ballaballa type scalar
+	=help a parameter with meta data
 
-Only the last line in this example is relevant to the program (named "buntstift" here). The rest is auxilliary information.
+	ballaballa = "0"
+
+Only the last line in this example is relevant to the program itself (named "par_acceptor" here). The rest is auxilliary information for outsiders.
 
 One last note: If a parameter value is undefined, no assignment is written to the config file. So a config file can never intentionally set a value to undefined state. You can start out with B<undef> values, but as soon as the parameter got set one time to something else, it won't go back B<undef>.
 
@@ -1677,7 +1683,7 @@ Do final actions, but do not exit on those. Also prevents dying in constructor (
 
 =item B<returnall> (0 / 1)
 
-makes get() return not only the parameter hash but also other stuff that is needed by the wrapper module Param::FileWorker
+makes get() return not only the parameter hash but also other stuff that is needed by the wrapper module L<Config::Param::FileWorker>
 
 =item B<notinfile> (listref)
 

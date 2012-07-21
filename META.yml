@@ -1,23 +1,27 @@
 ---
-name: Config-Param
-version: 3.000003
+abstract: "all you want to do with parameters for your program (or someone else's)"
 author:
   - 'Thomas Orgis <thomas@orgis.org>'
-abstract: "all you want to do with parameters for your program (or someone else's)"
-license: perl
-requires:
-  perl: 5.006
 build_requires:
   Test::More: 0
-generated_by: Module::Build version 0.280801
+configure_requires:
+  Module::Build: 0.39
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Param
 provides:
   Config::Param:
     file: lib/Config/Param.pm
-    version: 3.000003
+    version: 3.000004
   Config::Param::FileWorker:
     file: lib/Config/Param/FileWorker.pm
+    version: 0
+requires:
+  perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/
+version: 3.000004

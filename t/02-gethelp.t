@@ -242,14 +242,14 @@ The available parameters are these, default values (in Perl-compatible syntax) a
 
 =over 2
 
-=item B<config>, B<I>
+=item B<config>, B<I> (array)
 
 	[]
 
 Which configfile(s) to use (overriding automatic search in likely paths);
 special: just -I or --config causes printing a current config file to STDOUT
 
-=item B<help>, B<h>
+=item B<help>, B<h> (scalar)
 
 	0
 
@@ -259,19 +259,19 @@ show the help message; 1: normal help, >1: more help; "par": help for paramter "
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
 
-=item B<parm1>, B<a>
+=item B<parm1>, B<a> (scalar)
 
 	'a string'
 
 help text for scalar 1
 
-=item B<parm2>, B<b>
+=item B<parm2>, B<b> (scalar)
 
 	'a number'
 
 help text for scalar 2
 
-=item B<parmA>, B<A>
+=item B<parmA>, B<A> (array)
 
 	[
 	  1,
@@ -282,7 +282,7 @@ help text for scalar 2
 
 help text for array A
 
-=item B<parmH>, B<H>
+=item B<parmH>, B<H> (hash)
 
 	{
 	  donkey => 'animal',
@@ -291,7 +291,7 @@ help text for array A
 
 help text for hash H
 
-=item B<parmX>
+=item B<parmX> (scalar)
 
 	'Y'
 

@@ -19,7 +19,7 @@ use Carp;
 use 5.006;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000003';
+our $VERSION = '3.000004';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -744,6 +744,7 @@ sub print_pod
 	{
 		print $handle "\n=item B<".escape_pod($k).">".
 			($self->{short}{$k} ne '' ? ', B<'.escape_pod($self->{short}{$k}).'>' : '').
+			" ($typename[$self->{type}{$k}])".
 			"\n\n";
 		my @content = $k eq 'help'
 			? 0

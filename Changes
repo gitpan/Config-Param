@@ -2,6 +2,10 @@
 
 =over 2
 
+=item * B<3.000004> (2012-07-21)
+
+Include parameter types in POD output.
+
 =item * B<3.000003> (2012-07-20)
 
 Some documentation fixes of varying substance.

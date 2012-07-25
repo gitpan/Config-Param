@@ -16,10 +16,10 @@ package Config::Param;
 use strict;
 
 use Carp;
-use 5.006;
+use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000004';
+our $VERSION = '3.000005';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 

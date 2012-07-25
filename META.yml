@@ -3,6 +3,8 @@ abstract: "all you want to do with parameters for your program (or someone else'
 author:
   - 'Thomas Orgis <thomas@orgis.org>'
 build_requires:
+  File::Spec: 0
+  Storable: 0
   Test::More: 0
 configure_requires:
   Module::Build: 0.39
@@ -16,12 +18,12 @@ name: Config-Param
 provides:
   Config::Param:
     file: lib/Config/Param.pm
-    version: 3.000004
+    version: 3.000005
   Config::Param::FileWorker:
     file: lib/Config/Param/FileWorker.pm
     version: 0
 requires:
-  perl: 5.006
+  perl: 5.008
 resources:
   license: http://dev.perl.org/licenses/
-version: 3.000004
+version: 3.000005

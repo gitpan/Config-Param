@@ -10,9 +10,11 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Config/Param.pm',
     build_requires => {
         'Test::More' => 0,
+        'Storable' => 0,
+        'File::Spec' => 0
     },
     requires => {
-        'perl' => 5.006,
+        'perl' => 5.008,
     },
     script_files => [ 'script/paramorama' ],
     add_to_cleanup      => [ 'Config-Param-*' ],

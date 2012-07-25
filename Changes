@@ -2,6 +2,18 @@
 
 =over 2
 
+=item * B<3.000005> (2012-07-21)
+
+=over 2
+
+=item - Require Perl 5.8.0 as reliable base for main work and tests.
+
+=item - Require some modules explicitly.
+
+=item - Update POD of paramorama (and add TODO about fully automating that).
+
+=back
+
 =item * B<3.000004> (2012-07-21)
 
 Include parameter types in POD output.

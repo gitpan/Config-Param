@@ -79,7 +79,7 @@ paramorama - a tool to parse / write Config::Param config files for other progra
 
 =head1 SYNOPSIS
 
-	paramorama [parameters] some.conf [parameters] [param names]
+	script/paramorama [parameters] some.conf [parameters] [param names]
 
 =head1 DESCRIPTION
 
@@ -106,20 +106,20 @@ The available parameters are these, default values (in Perl-compatible syntax) a
 
 =over 2
 
-=item B<absolute>, B<a>
+=item B<absolute>, B<a> (scalar)
 
 	0
 
 print out absolute file paths
 
-=item B<config>, B<I>
+=item B<config>, B<I> (array)
 
 	[]
 
 Which configfile(s) to use (overriding automatic search in likely paths);
 special: just -I or --config causes printing a current config file to STDOUT
 
-=item B<help>, B<h>
+=item B<help>, B<h> (scalar)
 
 	0
 
@@ -129,19 +129,19 @@ show the help message; 1: normal help, >1: more help; "par": help for paramter "
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
 
-=item B<includes>, B<i>
+=item B<includes>, B<i> (scalar)
 
 	0
 
 print out list of included config files referenced from the given one (including the primary one)
 
-=item B<verbose>
+=item B<verbose> (scalar)
 
 	0
 
 be outspoken
 
-=item B<version>
+=item B<version> (scalar)
 
 	0
 

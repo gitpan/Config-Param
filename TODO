@@ -1,3 +1,7 @@
+=head1 POD script modificator
+
+The POD generation should be able to append to the script it calls, also updating earlier POD to make things easier for me. Forgot to update paramorama POD for version 3.000004!
+
 =head1 1. post-3.0.0: HALF-DONE: Add hashes, simple enough syntax 
 
 	--hash.=name=value, or just --hash=name=value

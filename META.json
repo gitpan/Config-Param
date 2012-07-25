@@ -16,6 +16,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Spec" : "0",
+            "Storable" : "0",
             "Test::More" : "0"
          }
       },
@@ -26,14 +28,14 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Config::Param" : {
          "file" : "lib/Config/Param.pm",
-         "version" : "3.000004"
+         "version" : "3.000005"
       },
       "Config::Param::FileWorker" : {
          "file" : "lib/Config/Param/FileWorker.pm",
@@ -46,5 +48,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "3.000004"
+   "version" : "3.000005"
 }

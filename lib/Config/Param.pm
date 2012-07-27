@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000005';
+our $VERSION = '3.000006';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -1179,7 +1179,7 @@ sub INT_definery
 		))
 	){ $self->define($curpar); }
 
-	$self->define({long=>$par}) if(not exists $self->{param}{$par} and $self->{config}{accept_unknown});
+	$self->define({long=>$par}) if(not exists $self->{param}{$par} and ($construct or $self->{config}{accept_unknown}));
 	%{$curpar} = ();
 }
 
@@ -1445,6 +1445,17 @@ The most complicated call is this, making only sense when disabling final exit:
 	$parm_ref = Config::Param::get(\%config,\@pardef,\@cmdline_args, $errors); 
 
 This will return a count of errors encountered (bad setup, bad command line args). With default configuration, the routine would not return on error, but end the program. Errors will be mentioned to STDERR in any case.
+
+Finally, you can use a Config::Param object to do what Config::Param::get does:
+
+	# equivalent to
+	# $parm_ref = Config::Param::get(\%config,\@pardef);
+	my $pars = Config::Param->new(\%config, \@pardef);
+	$pars->parse_args(\@ARGV);
+	$pars->use_config_files();
+	$pars->apply_args();
+	$pars->final_action();
+	$parm_ref = $pars->{param};
 
 =head1 DESCRIPTION
 
@@ -1766,7 +1777,7 @@ The simple procedural interface consists of mainly one function, but also some:
 	$parm_ref = Config::Param::get(\%config,\@pardef,\@cmdline_args, $errors);
 	$parm_ref = Config::Param::get(@pardef);
 
-This basically returns a hashref with parsed parameter values, from different variants of input (see SYNOPSIS and below for more). You can also fetch an error array ref, which only makes sense when disabling final actions, which would happen normally (the function not returning at all).
+This basically returns a hashref with parsed parameter values, from different variants of input (see SYNOPSIS). You can also fetch a reference to the error string array, which only makes sense when disabling final actions, which would happen normally (the function not returning at all).
 
 =item B<valid_name>
 
@@ -1802,7 +1813,7 @@ As it is an error to try and define a parmameter that conflicts with predfined l
 	$problem = Config::Param::sane_pardef(\%config,\@pardef);
 	die "bad parameter specification: $problem\n" if $problem;
 
-This checks the parameter definition for issues (noted in $problem string) and brings it into the preferred form for internal consumption. When problem is encountered the first return value is undefined. The provided config is supposed to be identical to the one used later.
+This checks the parameter definition for issues (noted in $problem string) and brings it into the preferred form for internal consumption. Returns empty string if no problem encountered. The provided config is supposed to be identical to the one used later.
 
 Using this function, you can prevent Config::Param::get() or Config::Param->new() from blowing up (using die()) on bad parameter specifications. If you do not take that extra care, it is assumed that blowing up is what you want on errors.
 
@@ -1947,7 +1958,7 @@ An array of files that have been parsed. You are free to reset that to be empty 
 
 =item B<errors>
 
-An array of collected error messages. You are free to empty it to start fresh.
+An array of collected error messages. You are free to empty it to indicate a fresh start.
 
 =back
 

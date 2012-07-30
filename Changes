@@ -2,6 +2,10 @@
 
 =over 2
 
+=item * B<3.000007> (2012-07-28)
+
+Consistent indent for value in single-parameter help.
+
 =item * B<3.000006> (2012-07-27)
 
 Fixing construction mode of parse_file to really behave as if accept_unknown had been specified (incomplete conditional). This fixes construction from files without full meta data.

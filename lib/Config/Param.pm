@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000006';
+our $VERSION = '3.000007';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -852,7 +852,8 @@ sub help
 		if(exists $self->{param}{$k})
 		{
 			print $handle "Parameter:\n\t$k".($self->{short}{$k} ne '' ? ", $self->{short}{$k}" : '')."\n";
-			print $handle "Value:\n\t".$self->par_content($k, 'dump', 1)."\n";
+			my $c = $self->par_content($k, 'dump', 1); $c =~s/\n/\n\t/g;
+			print $handle "Value:\n\t$c\n";
 			print $handle "Help:\n";
 			INT_wrap_print($handle, "\t","\t", $linewidth, ${$self->{help}{$k}});
 			INT_wrap_print($handle, "\t","\t", $linewidth, $self->{extrahelp})

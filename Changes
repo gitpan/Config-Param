@@ -2,6 +2,16 @@
 
 =over 2
 
+=item * B<3.000008> (2012-07-30)
+
+=over 2
+
+=item - Fix printout of selected parameter values for paramorama (of course, I managed to break it for its initial purpose while reworking the Param module API).
+
+=item - Fix construction mode for included config files (passing it along now).
+
+=back
+
 =item * B<3.000007> (2012-07-28)
 
 Consistent indent for value in single-parameter help.

@@ -67,7 +67,7 @@ $np->final_action();
 for my $parname (@ARGV)
 {
 	print STDERR "$parname not existing\n" unless exists $np->{param}{$parname};
-	print Config::Param::par_value($parname);
+	print $np->par_content($parname, 'lines');
 }
 
 __END__

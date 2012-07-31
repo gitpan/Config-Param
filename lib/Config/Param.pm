@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000007';
+our $VERSION = '3.000008';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -1065,7 +1065,7 @@ sub parse_file
 							$dir = File::Spec->rel2abs($dir);
 							$incfile = File::Spec->catfile($dir, $incfile); 
 						}
-						$self->parse_file($incfile);
+						$self->parse_file($incfile, $construct);
 					}
 				}
 				else
@@ -1920,12 +1920,13 @@ Return configuration hash and parameter definition array that corresponds to the
 
 =item B<par_content>
 
-	# dump in per-parseable format, with some pretty indent
+	# dump in perl-parseable format, with some pretty indent
 	$string = $param->par_content($name, 'dump', 2);
-	# or tring to fit on lines without other quoting
+	# lines without other quoting
 	$string = $param->par_content($name, 'lines');
 
 Return a string representing the content to given parameter key, with optional choice of format. Default is 'dump' with indent 0. Other choice is 'lines' for putting the value on a line or multiple lines, in case of arrays/hashes (newlines in values just happen, too, undef values result in empty lines, empty arrays/hashes in nothing at all).
+The third parameter chooses the indent style (see L<Data::Dumper>).
 
 =item B<print_pod>
 

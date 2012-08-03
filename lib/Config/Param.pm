@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000008';
+our $VERSION = '3.000009';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -359,13 +359,13 @@ sub find_config_files
 		if($self->{config}{multi})
 		{
 			#well, this is a nice example of totally relying on a two-valued array
-			shift(@l) unless (-f $l[0]); #remove default file from list when not existing
-			pop(@l) unless (-f $l[$#l]); #remove hostfile from list when not existing
+			shift(@l) unless (INT_filelike($l[0])); #remove default file from list when not existing
+			pop(@l) unless (INT_filelike($l[$#l])); #remove hostfile from list when not existing
 		}
 		else
 		{
-			pop(@l) unless (-f $l[$#l]); #only when existing
-			shift(@l) if ($#l == 1 or ! (-f $l[0])); #hehe...
+			pop(@l) unless (INT_filelike($l[$#l])); #only when existing
+			shift(@l) if ($#l == 1 or ! (INT_filelike($l[0]))); #hehe...
 		}
 		@{$self->{param}{config}} = @l;
 	}
@@ -970,6 +970,13 @@ sub INT_parse_files
 	return 1;
 }
 
+# check if it's existing and not a directory
+# _not_ explicitly checking for files as that would exclude things that otherwise would work as files just fine
+sub INT_filelike
+{
+	return (-e $_[0] and not -d $_[0])
+}
+
 # Parse one given file.
 sub parse_file
 {
@@ -982,9 +989,10 @@ sub parse_file
 	my $olderrors = @{$self->{errors}};
 	require IO::File;
 	$file =~ s/^~\//$ENV{HOME}\// if defined $ENV{HOME};
-	if(not -f $file and -f $file.'.conf'){ $file .= '.conf'; }
-	$file = File::Spec->catfile($self->{config}{confdir},$file) unless (-f $file); #look in confidir
-	if(not -f $file and -f $file.'.conf'){ $file .= '.conf'; }
+	if(not INT_filelike($file) and INT_filelike($file.'.conf')){ $file .= '.conf'; }
+	
+	$file = File::Spec->catfile($self->{config}{confdir},$file) unless (-e $file); #look in confidir
+	if(not INT_filelike($file) and INT_filelike($file.'.conf')){ $file .= '.conf'; }
 	$self->INT_verb_msg("parsing $file\n");
 	my $cdat = new IO::File;
 	if($cdat->open($file, '<'))

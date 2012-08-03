@@ -10,6 +10,7 @@ examples/lazy
 examples/simple
 examples/par_acceptor
 examples/par_acceptor.conf
+examples/par_acceptor_include.conf
 MANIFEST
 README
 t/00-load.t

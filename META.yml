@@ -18,7 +18,7 @@ name: Config-Param
 provides:
   Config::Param:
     file: lib/Config/Param.pm
-    version: 3.000008
+    version: 3.000009
   Config::Param::FileWorker:
     file: lib/Config/Param/FileWorker.pm
     version: 0
@@ -26,4 +26,4 @@ requires:
   perl: 5.008
 resources:
   license: http://dev.perl.org/licenses/
-version: 3.000008
+version: 3.000009

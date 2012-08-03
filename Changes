@@ -2,6 +2,12 @@
 
 =over 2
 
+=item * B<3.000009> (2012-07-31)
+
+Be more permissive about config file candidates: Everything that exists and is not a directory (makes /dev/fd/x special devices work).
+
+Oh, and examples/par_acceptor_include.conf is now in the distribution.
+
 =item * B<3.000008> (2012-07-30)
 
 =over 2

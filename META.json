@@ -35,7 +35,7 @@
    "provides" : {
       "Config::Param" : {
          "file" : "lib/Config/Param.pm",
-         "version" : "3.000009"
+         "version" : "3.000010"
       },
       "Config::Param::FileWorker" : {
          "file" : "lib/Config/Param/FileWorker.pm",
@@ -48,5 +48,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "3.000009"
+   "version" : "3.000010"
 }

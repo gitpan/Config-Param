@@ -2,6 +2,10 @@
 
 =over 2
 
+=item * B<3.000010> (2012-10-04)
+
+More checking of hash keys to make perl -w happy.
+
 =item * B<3.000009> (2012-07-31)
 
 Be more permissive about config file candidates: Everything that exists and is not a directory (makes /dev/fd/x special devices work).

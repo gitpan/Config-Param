@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000009';
+our $VERSION = '3.000010';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -166,13 +166,14 @@ sub INT_defchecker
 {
 	my $def = shift;
 	my $name_there = shift;
+	my $short = defined $def->{short} ? $def->{short} : '';
 
 	return "'".(defined $def->{long} ? $def->{long} : '')."' definition is not good"
 		unless valid_def($def);
 	return "'$def->{long}' ".(defined $def->{short} ? "/ $def->{short}" : '')." name alrady taken"
-		if($name_there->{$def->{long}} or $name_there->{$def->{short}});
+		if($name_there->{$def->{long}} or $name_there->{$short});
 	$name_there->{$def->{long}} = 1;
-	$name_there->{$def->{short}} = 1 if $def->{short} ne '';
+	$name_there->{$short} = 1 if $short ne '';
 
 	return ''; # no problem
 }

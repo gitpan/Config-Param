@@ -16,6 +16,13 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => 5.008,
     },
+    resources => {
+        repository => {
+             url => 'svn://scm.orgis.org/thor/param'
+            ,web => 'http://scm.orgis.org/view/thor/param'
+            ,type => 'svn'
+        }
+    },
     script_files => [ 'script/paramorama' ],
     add_to_cleanup      => [ 'Config-Param-*' ],
     create_makefile_pl => 'traditional',

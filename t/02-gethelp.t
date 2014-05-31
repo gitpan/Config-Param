@@ -55,6 +55,7 @@ sub get_output
 }
 
 $output = get_output('h');
+
 my $help = <<EOT;
 
 02-gethelp.t - just a program for testing
@@ -92,6 +93,7 @@ EOT
 ok( $output eq $help, 'normal help output' );
 
 $output = get_output('help=2');
+#print STDERR "output:\n$output\n";
 $help = <<EOT;
 
 02-gethelp.t - just a program for testing
@@ -127,7 +129,12 @@ available, notably ".=", "+=", "-=", "*=" and
 elements and scalar arithmetic operations on the
 value. Arrays are appended to via
 "array.=element", hash elements are set via
-"hash.=name=value".
+"hash.=name=value". You can also set more
+array/hash elements by specifying a separator
+after the long parameter line like this for comma
+separation:
+        --array/,/=1,2,3 
+--hash/,/=name=val,name2=val2
 
 Recognized parameters:
 NAME, SHORT VALUE [# DESCRIPTION]
@@ -217,6 +224,7 @@ ok( $output eq $help, 'lined values' );
 
 
 $output = get_output('-h=-100');
+#print STDERR "output:\n$output\n";
 
 $help = <<EOT;
 =head1 NAME
@@ -235,7 +243,8 @@ You mention the parameters/switches you want to change in any order or even mult
 An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
 Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
 
-There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value".
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:

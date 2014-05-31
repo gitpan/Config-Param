@@ -2,6 +2,17 @@
 
 =over 2
 
+=item * B<3.001000> (2014-05-31)
+
+=over 2
+
+=item - Rework logic for finding config files: Instead of looking for a fixed configuration directory (unless a specific one is configured), search every file in a default list of directories.
+To that list, ~/.config/program and ~/.config got added.
+
+=item - Add separator syntax for arrays and hashes (--array/,/=1,2,3).
+
+=back
+
 =item * B<3.000010> (2012-10-04)
 
 More checking of hash keys to make perl -w happy.

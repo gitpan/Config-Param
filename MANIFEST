@@ -24,6 +24,8 @@ t/04-geterror.t
 t/04-geterror.t.conf
 t/05-object.t
 t/06-fileworker.t
+t/07-separatorget.t
+t/07-separatorget.t.conf
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

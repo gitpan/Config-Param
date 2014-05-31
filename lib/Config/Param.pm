@@ -19,7 +19,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '3.000010';
+our $VERSION = '3.001000';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -83,9 +83,18 @@ my %typemap  = (''=>$scalar, scalar=>$scalar, array=>$array, hash=>$hash);
 # The checks for valid names besides the generic regexes are stricter and should be employed in addition.
 
 # Parser regex elements.
+# Generally, it's optinal operators before "=" or just operators for short parameters.
+# The addition with /./ is for choosing an arbitrary array separator for the value.
+# Since long names are not allowed to end with an operator, using "/" that way is
+# no additional restriction.
+# Looking for /./ first should work out for getting the full operator.
+# This extension does not work for short parameters, though, as there
+# -a/./4.4
+# is already parsed to mean to divide the value of a by "./4.4". That's behaviour that
+# we cannot change just like that, even if it rarely makes sense.
 my $ops = '.+\-*\/';
 my $sopex = '['.$ops.']?=|['.$ops.']';
-my $lopex = '['.$ops.']?=';
+my $lopex = '\/.\/['.$ops.']?=|['.$ops.']?='; 
 # rudimentary name check; manily forbid spaces and "="
 my $parname = '\w[\w'.$ops.']*\w';
 
@@ -115,7 +124,8 @@ my @morehelp =
 	,'An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).'."\n"
 	,'Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".'."\n"
 	,"\n"
-	,'There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value".'."\n"
+	,'There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:'."\n"
+	,"\t--array/,/=1,2,3  --hash/,/=name=val,name2=val2\n"
 );
 
 # check if long/short name is valid before use
@@ -333,40 +343,23 @@ sub find_config_files
 			? @{$self->{config}{file}}
 			: ($self->{config}{file});
 	}
-	#determine directory to search config files in
-	unless(defined $self->{config}{confdir})
-	{
-		for my $d
-		(
-			 File::Spec->catfile($ENV{HOME},'.'.$self->{config}{program})
-			,File::Spec->catfile($Bin,'..','etc',$self->{config}{program})
-			,File::Spec->catfile($Bin,'..','etc')
-			,File::Spec->catfile($Bin,'etc')
-			,$Bin
-		)
-		{
-			if(-d $d){ $self->{config}{confdir} = $d; last; }
-		}
-	}
-	$self->INT_verb_msg("Looking for config files in $self->{config}{confdir}\n");
 	#means: nofile[false,true], file[string], info, verbose[bool],  
 	#config confusion
 	# as long as I was told not to use a config file or it has been already given
 	unless($self->{config}{nofile} or @{$self->{param}{config}})
 	{
-		#scan for a config file
-		my @l = ( File::Spec->catfile($self->{config}{confdir},$self->{config}{program}.'.conf'), File::Spec->catfile($self->{config}{confdir},$self->{config}{program}.'.'.hostname().'.conf') );
+		# Default to reading program.conf and/or program.host.conf if found.
+		my $pconf = $self->INT_find_config($self->{config}{program}.'.conf');
+		my $hconf = $self->INT_find_config($self->{config}{program}.'.'.hostname().'.conf');
+		my @l;
+		push(@l, $pconf) if defined $pconf;
+		push(@l, $hconf) if defined $hconf;
+		# That list can be empty if none existing.
 		$self->INT_verb_msg("possible config files: @l\n");
-		if($self->{config}{multi})
+		# The last entry in the list has precedence.
+		unless($self->{config}{multi})
 		{
-			#well, this is a nice example of totally relying on a two-valued array
-			shift(@l) unless (INT_filelike($l[0])); #remove default file from list when not existing
-			pop(@l) unless (INT_filelike($l[$#l])); #remove hostfile from list when not existing
-		}
-		else
-		{
-			pop(@l) unless (INT_filelike($l[$#l])); #only when existing
-			shift(@l) if ($#l == 1 or ! (INT_filelike($l[0]))); #hehe...
+			@l = ($l[$#l]) if @l; # Only the last element, if any, prevails.
 		}
 		@{$self->{param}{config}} = @l;
 	}
@@ -431,11 +424,13 @@ sub parse_args
 				$sname = $3;
 				$val = $sign =~ /^-/ ? 1 : 0;
 				$op = '=';
+				$self->INT_verb_msg("sname=$sname, default op =\n");
 				if($sname eq 'I'){ $self->{printconfig} += 1; undef $op; }
 			}
 			if(defined $op)
 			{
 				$op .= '=' unless $op =~ /=$/;
+				$self->INT_verb_msg("sname=$sname op=$op\n");
 				my @names; # the list of real parameters
 				# check for valid parameter names
 				for my $s (split(//,$sname))
@@ -978,25 +973,76 @@ sub INT_filelike
 	return (-e $_[0] and not -d $_[0])
 }
 
+# Look for given config file name in configured directory or search for it in
+# the list of likely places. Appending the ending .conf is also tried.
+sub INT_find_config
+{
+	my $self = shift;
+	my $name = shift;
+
+	return $name if File::Spec->file_name_is_absolute($name);
+
+	# Let's special-case the current working directory. Do not want to spell it
+	# out for the directory search loop.
+	# But yes, it is a bit of duplication with the .conf addition. Sorry.
+	return $name if(INT_filelike($name));
+	return "$name.conf" if(INT_filelike("$name.conf"));
+
+	my $path;
+	my @dirs;
+	#determine directory to search config files in
+	if(defined $self->{config}{confdir})
+	{
+		@dirs = ($self->{config}{confdir});
+	}
+	else
+	{
+		@dirs = (
+		 File::Spec->catfile($ENV{HOME},'.'.$self->{config}{program})
+		,File::Spec->catfile($Bin,'..','etc',$self->{config}{program})
+		,File::Spec->catfile($Bin,'..','etc')
+		,File::Spec->catfile($Bin,'etc')
+		,$Bin
+		,File::Spec->catfile($ENV{HOME},'.config',$self->{config}{program})
+		,File::Spec->catfile($ENV{HOME},'.config')
+		);
+	}
+
+	for my $d (@dirs)
+	{
+		my $f = File::Spec->catfile($d, $name);
+		$f .= '.conf' unless INT_filelike($f);
+		if(INT_filelike($f))
+		{
+			$path = $f;
+			last;
+		}
+	}
+
+	$self->INT_verb_msg("Found config: $path\n") if defined $path;
+	return $path
+}
+
 # Parse one given file.
 sub parse_file
 {
 	my $self = shift;
-	my $file = shift;
+	my $confname = shift;
 	my $construct = shift;
 
 	my $lend = '(\012\015|\012|\015)';
 	my $nlend = '[^\012\015]';
 	my $olderrors = @{$self->{errors}};
 	require IO::File;
-	$file =~ s/^~\//$ENV{HOME}\// if defined $ENV{HOME};
-	if(not INT_filelike($file) and INT_filelike($file.'.conf')){ $file .= '.conf'; }
-	
-	$file = File::Spec->catfile($self->{config}{confdir},$file) unless (-e $file); #look in confidir
-	if(not INT_filelike($file) and INT_filelike($file.'.conf')){ $file .= '.conf'; }
-	$self->INT_verb_msg("parsing $file\n");
+
+	# TODO: Support loading multiple occurences in order.
+	my $file = $self->INT_find_config($confname);
 	my $cdat = new IO::File;
-	if($cdat->open($file, '<'))
+	if(not defined $file)
+	{
+		$self->INT_error("Couldn't find config file $confname!") unless $self->{config}{nocomplain};
+	}
+	elsif($cdat->open($file, '<'))
 	{
 		push(@{$self->{files}}, $file);
 		if(defined $self->{config}{binmode})
@@ -1319,32 +1365,73 @@ sub INT_apply_op
 	my $self = shift; # (par, op, value)
 	return unless exists $self->{param}{$_[0]};
 
+
 	if($self->{type}{$_[0]} == $scalar)
 	{
-		if   ($_[1] eq  '='){ $self->{param}{$_[0]}  = $_[2]; }
-		elsif($_[1] eq '.='){ $self->{param}{$_[0]} .= $_[2]; }
-		elsif($_[1] eq '+='){ $self->{param}{$_[0]} += $_[2]; }
-		elsif($_[1] eq '-='){ $self->{param}{$_[0]} -= $_[2]; }
-		elsif($_[1] eq '*='){ $self->{param}{$_[0]} *= $_[2]; }
-		elsif($_[1] eq '/='){ $self->{param}{$_[0]} /= $_[2]; }
+		my $par = \$self->{param}{$_[0]}; # scalar ref
+		if   ($_[1] eq  '='){ $$par  = $_[2]; }
+		elsif($_[1] eq '.='){ $$par .= $_[2]; }
+		elsif($_[1] eq '+='){ $$par += $_[2]; }
+		elsif($_[1] eq '-='){ $$par -= $_[2]; }
+		elsif($_[1] eq '*='){ $$par *= $_[2]; }
+		elsif($_[1] eq '/='){ $$par /= $_[2]; }
 		else{ $self->INT_error("Operator '$_[1]' on '$_[0]' is invalid."); $self->{param}{help} = 1; }
 	}
 	elsif($self->{type}{$_[0]} == $array)
 	{
-		if   ($_[1] eq  '='){ $self->{param}{$_[0]} = [ $_[2] ]; }
-		elsif($_[1] eq '.='){ push(@{$self->{param}{$_[0]}}, $_[2]); }
-		else{ $self->INT_error("Operator '$_[1]' is invalid for array '$_[0]'!"); $self->{param}{help} = 1; }
+		my $par = $self->{param}{$_[0]}; # array ref
+		my $bad;
+		if   ($_[1] eq  '='){ @{$par} = ( $_[2] ); }
+		elsif($_[1] eq '.='){ push(@{$par}, $_[2]); }
+		elsif($_[1] =~ m:^/(.)/(.*)$:) # operator with specified array separator
+		{
+			my $sep = $1; # array separator
+			my $op  = $2; # actual operator
+			my @values = split($sep, $_[2]);
+			if   ($op eq  '='){ @{$par} = @values; }
+			elsif($op eq '.='){ push(@{$par}, @values); }
+			else{ $bad = 1; }
+		}
+		else{ $bad = 1 }
+		if($bad)
+		{
+			$self->INT_error("Operator '$_[1]' is invalid for array '$_[0]'!");
+			$self->{param}{help} = 1;
+		}
 	}
 	elsif($self->{type}{$_[0]} == $hash)
 	{
-		my $key = $_[2];
-		my $hval = undef; # you can push undefined values, which exist
-		# looking for key at begining (first line only)
-		if($key =~ /^([^=]+)=/){ $hval = substr($key, length($1)+1); $key = $1; }
+		my $par = $self->{param}{$_[0]}; # hash ref
+		my $bad;
 
-		if   ($_[1] eq  '='){ $self->{param}{$_[0]} = { $key=>$hval }; }
-		elsif($_[1] eq '.='){ $self->{param}{$_[0]}{$key} = $hval; }
-		else{ $self->INT_error("Operator '$_[1]' is invalid for hash '$_[0]'!"); $self->{param}{help} = 1; }
+		if($_[1] =~ m:^/(.)/(.*)$:) # operator with specified array separator
+		{
+			my $sep = $1; # array separator
+			my $op  = $2; # actual operator
+			my @values = split($sep, $_[2]);
+			# a sub just to avoid duplicating the name=value splitting and setting
+			sub INT_push_hash
+			{ my $par = shift; for (@_) {
+				my ($k, $v) = split('=',$_,2);
+				$par->{$k} = $v;
+			}}
+			if   ($op eq  '='){ %{$par} = (); INT_push_hash($par,@values); }
+			elsif($op eq '.='){ INT_push_hash($par,@values); }
+			else{ $bad = 1; }
+		}
+		else
+		{
+			# looking for key at begining (first line only)
+			my ($key, $hval) = split('=', $_[2],2);
+			if   ($_[1] eq  '='){ %{$par} = ( $key=>$hval ); }
+			elsif($_[1] eq '.='){ $par->{$key} = $hval; }
+			else{ $bad = 1 }
+		}
+		if($bad)
+		{
+			$self->INT_error("Operator '$_[1]' is invalid for hash '$_[0]'!");
+			$self->{param}{help} = 1;
+		}
 	}
 }
 
@@ -1493,7 +1580,24 @@ This is especially important for sanely working with hashes and arrays:
 	--hashpar.=name=value --hashpar.=name2=value2
 	--arraypar=value --arraypar.=value2
 
-The plain "=" operator resets the whole array/hash! Besides ".=", these operators are available:
+The plain "=" operator resets the whole array/hash! For arrays and hashes, there is another specialty: You can specify a single-character separator to split up the argument by enclosing it in forward slashes before the plain operator:
+
+	--hashpar/,/=name=value,name2=value2 --hashpar/:/.=name3=value3:name4=value4
+	--arraypar/,/=a,b,c --arraypar/:/.=d:e:f
+
+This extension is only present for the syntax using long parameter names, where the
+equal sign is mandatory. So be aware of
+
+	-a/,/3,4
+
+meaning to divide the value of a by ",/3,4" (which is nonsense, but valid syntax already without
+the extension for array/hash separators). Even adding an equal sign would not change this.
+
+There is no advanced parsing with quoting of separator characters --- that's why
+you can choose an appropriate one so that simple splitting at occurences does the
+right thing.
+
+These plain operators are available:
 
 =over 4
 
@@ -1673,7 +1777,32 @@ If activated, potentially parses all located default config files in a row inste
 
 =item B<confdir> (directory path)
 
-Define a directory for searching of config files, overriding the internal default of "../etc" relative to the directory containing the program  (or the program dir itself if no etc there); explicitly given files are always searched in the current working directory first if the given form does not already specify an existing file completely.
+Define a directory for searching of config files, overriding the internal defaults of looking at various likely places (in order), with "bin" being the directory the program resides in, "~" the user home directory:
+
+=over 4
+
+=item ~/.programname
+
+=item bin/../etc/programname
+
+=item bin/../etc
+
+=item bin/etc
+
+=item bin
+
+=item ~/.config/programname
+
+=item ~/.config
+
+The contents and ordering of that list carry over behaviour in earlier versions of Config::Param, where the first existing directory in that list got used as single source for config files. During addition of the .config/ variants for version 3.001, this got changed to search the whole list (plus current working directory) for each requested file.
+This should provide reasonable compatibility to existing setups and a flexible way forward to enhance the ability to find config files.
+Note that you can always skip all that automatic fuss by specifying full paths to the desired config files. This just offers some convenience at the expense of predictability in case of conflicting config files of the same name at different locations.
+TODO: A future release may offer to override this list and tell Config::Param to locate multiple occurences of one config file name and load them in order. In that case, you probably want to change the order to look in global directories first, then in the users's home for specific settings overriding global defaults.
+
+=back
+
+Explicitly given files without absolute path are always searched in the current working directory first.
 
 =item B<file> (single file name/path or array ref of those)
 
@@ -1911,6 +2040,8 @@ Possibly execute final action as determined by parameter values or encountered e
 =item B<parse_file>
 
 Parse given configuration file. Optional parameter (when true) triggers full usage of meta data to complete/override setup.
+If the given file specification is no full absolute path, it is searched in usual places or in specified configuration directory (see confdir).
+Note that versions before 3.001 replaced a "~" at the beginning with the home directory. While that may be convenient in certain moments where the shell does not do that itself, such is still is the shell's task and possibly causes confusion.
 
 	$param->parse_file($file, $construct);
 
@@ -1989,7 +2120,7 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2012, Thomas Orgis.
+Copyright (C) 2004-2014, Thomas Orgis.
 
 This module is free software; you
 can redistribute it and/or modify it under the same terms
